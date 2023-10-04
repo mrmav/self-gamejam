@@ -1,4 +1,5 @@
-date - hours - comment
+date : total hours - comment
 
-18.22 01.10.2024 - 1 - Setup and first brainstorm 
-19.42 04.10.2024 - 2 - 
+18.22 01.10.2024 : 1 - Setup and first brainstorm;
+19.42 04.10.2024 : 1 - Simpler game planning (changed from using Godot to using my own framework;
+                       Configuring repo and dependencies;
