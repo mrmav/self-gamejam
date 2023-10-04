@@ -1,8 +1,9 @@
 #include <iostream>
+#include <Engine.h>
 
 int main()
 {
-    std::cout << "Hello configured project!" << std::endl;
-
+    _ENGINE_LOG("Launcher", "Hello configured project!.")
+    
     return 0;
 }

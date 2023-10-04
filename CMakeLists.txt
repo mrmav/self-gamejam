@@ -8,18 +8,19 @@ option(GAME_INSTALL "Installs the game." ON)
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCE})
 
+target_include_directories(${PROJECT_NAME}    
+    PUBLIC engine/external/glm
+    PUBLIC engine/src
+    PUBLIC src/
+)
+
 # add our content
 add_subdirectory(src)
 
 # build libraries
 add_subdirectory(engine)
 
-target_include_directories(${PROJECT_NAME}
-    PUBLIC engine/
-    PUBLIC src/
-)
-
-target_link_directories(${PROJECT_NAME} PRIVATE engine)
+target_link_libraries(${PROJECT_NAME} PRIVATE simple-cpp-engine)
 add_dependencies(${PROJECT_NAME} simple-cpp-engine)
 
 if(GAME_INSTALL)
