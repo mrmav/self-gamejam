@@ -1,9 +1,11 @@
 set(HEADERS
-    ${HEADERS}     
+    ${HEADERS}
+    SkiGame.h
 )
 
 set(SOURCE
     ${SOURCE}
+    SkiGame.cpp
     main.cpp
 )
 

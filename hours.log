@@ -1,5 +1,13 @@
-date : total hours - comment
+01.10.2024:
+    
+    18.22 - 19.00
+        Setup and first brainstorm;
 
-18.22 01.10.2024 : 1 - Setup and first brainstorm;
-19.42 04.10.2024 : 1 - Simpler game planning (changed from using Godot to using my own framework;
-                       Configuring repo and dependencies;
+04.10.2024:
+    
+    19.42 - 20.52:
+        Simpler game planning (changed from using Godot to using my own framework;
+        Configuring repo and dependencies;
+    
+    22.00 - 00.54:
+        Implementation of the FrameAnimations
