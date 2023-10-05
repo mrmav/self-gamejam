@@ -1,10 +1,12 @@
 set(HEADERS
     ${HEADERS}
-    SkiGame.h
+    MapLoader.h
+    SkiGame.h    
 )
 
 set(SOURCE
     ${SOURCE}
+    MapLoader.cpp
     SkiGame.cpp
     main.cpp
 )

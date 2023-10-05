@@ -1,7 +1,11 @@
 #include <Engine.h>
+#include <iostream>
 
 namespace GameContent
 {
+
+    void UpdateDebugCamera(float delta, Ref<Engine::Camera2D> camera);
+
     class SkiGame : public Engine::Game
     {
         public:
