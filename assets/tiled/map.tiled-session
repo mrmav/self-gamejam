@@ -1,0 +1,70 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map.tmx",
+    "expandedProjectPaths": [
+        ".",
+        "objects"
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "/home/mrmav/repos/self-gamejam/assets/kenney_tiny-ski/Tiled/sampleMap.tmx": {
+            "scale": 3.079838709677419,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 247.7402461377324,
+                "y": 144.00104739460596
+            }
+        },
+        "/home/mrmav/repos/self-gamejam/assets/kenney_tiny-ski/Tiled/sampleSheet.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "map.tmx": {
+            "scale": 4,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.25,
+                "y": 80.25
+            }
+        },
+        "tilemap.json": {
+            "scaleInDock": 2
+        },
+        "tilemap.tsj": {
+            "scaleInDock": 3,
+            "scaleInEditor": 8
+        }
+    },
+    "last.exportedFilePath": "/home/mrmav/repos/self-gamejam/assets/tiled",
+    "last.externalTilesetPath": "/home/mrmav/repos/self-gamejam/assets/tiled",
+    "last.imagePath": "/home/mrmav/repos/self-gamejam/assets/kenney_tiny-ski/Tilemap",
+    "last.objectTemplatePath": "/home/mrmav/repos/self-gamejam/assets/tiled/objects",
+    "map.height": 60,
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 30,
+    "openFiles": [
+        "tilemap.tsj",
+        "map.tmx"
+    ],
+    "project": "map.tiled-project",
+    "recentFiles": [
+        "map.tmx",
+        "tilemap.tsj",
+        "/home/mrmav/repos/self-gamejam/assets/kenney_tiny-ski/Tiled/sampleMap.tmx",
+        "/home/mrmav/repos/self-gamejam/assets/kenney_tiny-ski/Tiled/sampleSheet.tsx"
+    ],
+    "tileset.lastUsedFormat": "json",
+    "tileset.margin": 0,
+    "tileset.spacing": 1,
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    },
+    "tileset.useTransparentColor": true
+}
