@@ -36,10 +36,25 @@ namespace GameContent
     {
         Rectangle<int>(136, 102, 16, 16)
     };
-    AnimationSet badguyAnimationsMap;
-    AnimationSet playerAnimationsMap;
 
-    Player player;
+    std::vector<Rectangle<int>> playerOneSkiFrames = 
+    {
+        Rectangle<int>(170, 102, 16, 16),
+        Rectangle<int>(187, 102, 16, 16)
+    };
+
+    std::vector<Rectangle<int>> playerTwoSkiFrames = 
+    {
+        Rectangle<int>(170, 85, 16, 16),
+        Rectangle<int>(187, 85, 16, 16)
+    };
+
+    AnimationSet badguyAnimationsMap;
+    AnimationSet playerOneAnimationsMap;
+    AnimationSet playerTwoAnimationsMap;
+
+    Player playerOne;
+    Player playerTwo;
 
     void UpdateDebugCamera(float delta, Ref<Camera2D> camera)
     {
@@ -139,23 +154,28 @@ namespace GameContent
         badguy = Sprite(8 * 16, 7 * 16, std::make_shared<AnimationSet>(badguyAnimationsMap));
 
         // test sprites
-        playerAnimationsMap = {
-            {"idle",   FrameAnimation(TILEMAP, badGuyIdleFrames.data(),   2)},
-            {"attack", FrameAnimation(TILEMAP, badGuyAttackFrames.data(), 1)}
+        playerOneAnimationsMap = {
+            {"ski", FrameAnimation(TILEMAP, playerOneSkiFrames.data(), 2)}
+        };
+        playerTwoAnimationsMap = {
+            {"ski", FrameAnimation(TILEMAP, playerTwoSkiFrames.data(), 2)}
         };
         
         // for a keyboard controller:
-        //Ref<InputCursor> playerController = std::make_shared<InputCursor>(Key::Left, Key::Right, Key::Space);
+        Ref<InputCursor> playerTwoController = std::make_shared<InputCursor>(Key::Left, Key::Right, Key::Space);
 
         // for a gamepad controller:
         //Ref<InputCursor> playerController = std::make_shared<InputCursor>(0, GamePadButton::DPadLeft, GamePadButton::DPadRight, GamePadButton::ButtonA);
         
         // for a gamepad controller with axis (sticks):
-        Ref<InputCursor> playerController = std::make_shared<InputCursor>(0, true, GamePadAxis::GamePadAxisLeftX, GamePadButton::ButtonA);
+        Ref<InputCursor> playerOneController = std::make_shared<InputCursor>(0, true, GamePadAxis::GamePadAxisLeftX, GamePadButton::ButtonA);
         
 
-        player = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerAnimationsMap), playerController);
-        player.SetAnimation("idle")->Play();
+        playerOne = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerOneAnimationsMap), playerOneController);
+        playerOne.SetAnimation("ski")->Play();
+
+        playerTwo = Player(14 * 16, 2 * 16, std::make_shared<AnimationSet>(playerTwoAnimationsMap), playerTwoController);
+        playerTwo.SetAnimation("ski")->Play();
         
 
         Input::SetDeadZone(0, 0.2f);
@@ -178,9 +198,13 @@ namespace GameContent
         }
 
         badguy.Update(delta);
-        player.Update(delta);
+        playerOne.Update(delta);
+        playerTwo.Update(delta);
 
-        camera->Position = glm::vec3(player.Position.x, player.Position.y, 0);
+        // point the camera to the middle of the players
+        glm::vec2 midPoint = playerOne.Position - playerTwo.Position;
+        midPoint = playerTwo.Position + midPoint * 0.5f;
+        camera->Position = glm::vec3(midPoint.x, midPoint.y, 0);
         UpdateDebugCamera(delta, camera);
         camera->Update(delta);
 
@@ -240,7 +264,8 @@ namespace GameContent
 
         //batcher->Draw(animation->GetTexture().get(), -8, 0, *animation->GetCurrentFrame());
         badguy.Render(delta, batcher);
-        player.Render(delta, batcher);
+        playerOne.Render(delta, batcher);
+        playerTwo.Render(delta, batcher);
 
         batcher->End();
     };

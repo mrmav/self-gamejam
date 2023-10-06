@@ -21,8 +21,12 @@ namespace GameContent
         glm::vec2 move(0.0f, 0.0f);
 
         if(_Controller->IsGamePad())
-        {
-            move.x += _SideSpeed * _Controller->GetAxis();
+        {   
+            int dir = 0;
+            if(_Controller->GetAxis() > 0)      dir =  1;
+            else if(_Controller->GetAxis() < 0) dir = -1;
+            
+            move.x += _SideSpeed * dir;
         }
         else
         {
