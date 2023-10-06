@@ -25,5 +25,26 @@ namespace GameContent
 
         _WorldSize = _WorldTileSize * _TileSize;
 
+        // store the terrain data
+        json layers_data = _MapData.at("layers");
+
+        for(auto& layer : layers_data)
+        {
+            if(layer["name"] == std::string("Terrain"))
+            {
+                _TerrainLayerData = layer.at("data").get<std::vector<int>>();
+            }
+            
+        }
+
     }
+
+    bool MapLoader::CheckTilesIndex(const std::vector<uint32_t>& tiles, uint32_t value) const
+    {
+        for(int i = 0; i < tiles.size(); i++)
+        {
+            if(tiles[i] == value) return true;
+        }
+        return false;
+    };
 }
