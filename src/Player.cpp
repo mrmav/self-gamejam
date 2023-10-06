@@ -3,8 +3,8 @@
 namespace GameContent
 {
     
-    Player::Player(int x, int y, Ref<AnimationSet> animations, Ref<InputCursor> controller)
-     : Sprite(x, y, animations), _Controller(controller)
+    Player::Player(int x, int y, Ref<AnimationSet> animations, Ref<InputCursor> controller, MapLoader* map)
+     : Sprite(x, y, animations), _Controller(controller), _LoadedMap(map)
      {
         
      }
@@ -53,6 +53,12 @@ namespace GameContent
         Move(move * delta);
 
         //std::cout << glm::to_string(Position) << "Moved by: " << glm::to_string(move * delta) << std::endl;
+        
+        if (Position.x < 0) Position.x = 0;
+        if (Position.x + _LoadedMap->GetTileSize().x > _LoadedMap->GetWorldSize().x)
+        {
+            Position.x = _LoadedMap->GetWorldSize().x - _LoadedMap->GetTileSize().x;
+        }
 
         // Update animations and such:
         Sprite::Update(delta);

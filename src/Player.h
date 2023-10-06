@@ -3,6 +3,7 @@
 #include <Engine.h>
 #include "Sprite.h"
 #include "InputCursor.h"
+#include "MapLoader.h"
 
 namespace GameContent
 {
@@ -12,6 +13,8 @@ namespace GameContent
         private:
 
             Ref<InputCursor> _Controller;
+            
+            const MapLoader* _LoadedMap;
 
             float _SideSpeed = 50.0f;
             float _SlideSpeed = 30.0f;
@@ -19,7 +22,7 @@ namespace GameContent
         public:
 
             Player() { };
-            Player(int x, int y, Ref<AnimationSet> animations, Ref<InputCursor> controller);
+            Player(int x, int y, Ref<AnimationSet> animations, Ref<InputCursor> controller, MapLoader* map);
             ~Player();
 
             void Move(glm::vec2 distance)
