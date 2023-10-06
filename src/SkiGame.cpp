@@ -1,29 +1,41 @@
+#include <iostream>
 #include <Engine.h>
 #include <json.hpp>
+#include <map>
+
 #include "SkiGame.h"
 #include "MapLoader.h"
-#include <iostream>
+#include "Sprite.h"
 
 using namespace Engine;
 using json = nlohmann::json;
+using AnimationSet = std::map<std::string, FrameAnimation>;
+
 
 namespace GameContent
 {   
+
     Ref<Camera2D> camera;
     Ref<Spritebatch> batcher;
     Ref<Shader> shader;
     
     Ref<Texture2D> TILEMAP;
     Ref<FrameAnimation> animation;
-    std::vector<Rectangle<int>> frames = 
-    {
-        Rectangle<int>(102, 102, 16, 16),
-        Rectangle<int>(119, 102, 16, 16),
-        Rectangle<int>(136, 102, 16, 16)
-    };
 
     MapLoader map;
     Ref<TileSet> tileset;
+
+    Sprite badguy;
+    std::vector<Rectangle<int>> badGuyIdleFrames = 
+    {
+        Rectangle<int>(102, 102, 16, 16),
+        Rectangle<int>(119, 102, 16, 16)
+    };
+    std::vector<Rectangle<int>> badGuyAttackFrames = 
+    {
+        Rectangle<int>(136, 102, 16, 16)
+    };
+    AnimationSet badguyAnimationsMap;
 
     void UpdateDebugCamera(float delta, Ref<Camera2D> camera)
     {
@@ -32,6 +44,9 @@ namespace GameContent
         camera->Position.x += Input::GetAxisStrength(0, GamePadAxis::GamePadAxisLeftX) * speed * delta;
         camera->Position.y += Input::GetAxisStrength(0, GamePadAxis::GamePadAxisLeftY) * speed * delta;
         
+        static Cursor mpos;
+        static bool dragging = false;
+
         if(Input::IsKeyPressed(Key::A))
         {
             camera->Position.x -= speed * delta;
@@ -47,13 +62,33 @@ namespace GameContent
             camera->Position.y += speed * delta;
         }
                         
-        if (Input::IsMouseButtonPressed(Mouse::MouseButtonLeft))
-        {
-            camera->Zoom -= max(0.0f, (camera->Zoom / zoomSpeed)) * delta;
+        if (!dragging && Input::IsMouseButtonPressed(Mouse::MouseButtonLeft))
+        {   
+            mpos = Input::GetCursorPosition();
+            dragging = true;
+        }
+        
+        if (Input::IsKeyPressed(Key::LeftControl) && Input::IsMouseButtonPressed(Mouse::MouseButtonRight))
+        {        
+            camera->Zoom -= max(0.0f, (camera->Zoom / zoomSpeed)) * delta;            
         }
         else if (Input::IsMouseButtonPressed(Mouse::MouseButtonRight))
         {        
             camera->Zoom += max(0.0f, (camera->Zoom / zoomSpeed)) * delta;
+        }
+
+        if(dragging)
+        {
+            if (Input::IsMouseButtonUp(Mouse::MouseButtonLeft))
+            {
+                dragging = false;
+            }
+            glm::vec3 diff = (glm::vec3(Input::GetCursorPosition().x, Input::GetCursorPosition().y, 0) - glm::vec3(mpos.x, mpos.y, 0));
+            //std::cout << Input::GetCursorPosition().x << ", " << Input::GetCursorPosition().y << std::endl;
+            //std::cout << glm::to_string(diff) << std::endl;
+            camera->Position += diff * delta;
+            //camera->Position.x += 10 * delta;
+            //mpos = Input::GetCursorPosition();
         }
 
         // clamp zoom
@@ -70,25 +105,34 @@ namespace GameContent
 
     void SkiGame::Load()
     {
-        useRenderTarget = true;
-        renderTargetWidth  = 800 / 4;
-        renderTargetHeight = 600 / 4;
-        SetRenderTarget();
+        // useRenderTarget = true;
+        // renderTargetWidth  = 800 / 4;
+        // renderTargetHeight = 600 / 4;
+        // SetRenderTarget();
         
         map = MapLoader("assets/tiled/map.json");
         // json map_data = map.GetData();
         // std::cout << map_data["version"] << std::endl;
 
         camera = std::make_shared<Camera2D>(GetViewport());
+        camera->Position.z = -100;
+
         batcher = std::make_shared<Spritebatch>();
         shader = std::make_shared<Shader>("assets/shaders/vertex.vert", "assets/shaders/fragment.frag");
 
         TILEMAP = std::make_shared<Texture2D>("assets/kenney_tiny-ski/Tilemap/tilemap.png", TextureParams());
         tileset = std::make_shared<TileSet>(TILEMAP, 12, 0, 16, 16, 0, 1);
 
-        animation = std::make_shared<FrameAnimation>(TILEMAP, frames.data(), 3);
-        animation->loop = true;
-        animation->SetFps(6);
+        // animation = std::make_shared<FrameAnimation>(TILEMAP, frames.data(), 3);
+        // animation->loop = true;
+        // animation->SetFps(6);
+
+        // test sprites
+        badguyAnimationsMap = {
+            {"idle",   FrameAnimation(TILEMAP, badGuyIdleFrames.data(),   2)},
+            {"attack", FrameAnimation(TILEMAP, badGuyAttackFrames.data(), 1)}
+        };
+        badguy = Sprite(8 * 16, 7 * 16, std::make_shared<AnimationSet>(badguyAnimationsMap));
 
         Input::SetDeadZone(0, 0.2f);
 
@@ -100,16 +144,19 @@ namespace GameContent
         UpdateDebugCamera(delta, camera);
         camera->Update(delta);
 
-        if(Input::IsKeyJustDown(Key::Space))
+        if(Input::IsKeyJustDown(Key::N))
         {
-            animation->Play();
+            std::cout << "Btn Idle" << std::endl;
+            badguy.SetAnimation("idle")->Play();
         }
-        animation->Update(delta);
+        if(Input::IsKeyJustDown(Key::M))
+        {
+            std::cout << "Btn Attack" << std::endl;
+            badguy.SetAnimation("attack")->Play();
+        }
 
-        if(Input::IsButtonJustDown(0, GamePadButton::ButtonA))
-        {
-            std::cout << "Btn down" << std::endl;
-        }
+        badguy.Update(delta);
+
     };
 
 
@@ -126,41 +173,47 @@ namespace GameContent
         int mapHeight = map_data["height"];        
         json layers_data = map_data.at("layers");
 
-        // get the terrain layer
-        json terrain_layer = nullptr;
-        for(auto& el : layers_data)
+        // We area assuming that there is only one tileset.
+        // Assuming this, we render each layer in a separate pass:        
+        uint16_t depth = 0;
+        for(auto& layer : layers_data)
         {
-            //std::cout << "Layer: " << el.at("name") << std::endl;
-            if(el.at("name") == std::string("Terrain"))
+            
+            if(layer["type"] != std::string("tilelayer")) continue;
+            //if(layer["name"] == std::string("Terrain")) continue;
+
+            int currentTileIndex = 0;
+
+            batcher->Begin(shader.get(), camera.get(), glm::vec4(1), depth);
+
+            std::string str = layer.at("name");
+            bool is_p = str == std::string("PowerUps");
+            //std::cout << "Drawing layer " << layer["name"] << ", at depth: " << std::to_string(depth) << std::endl;
+
+            for(int y = 0; y < mapHeight; y++)
             {
-                terrain_layer = el;
-                break;
-            }
-        }
-    
-        int currentTileIndex = 0;
-        batcher->Begin(shader.get(), camera.get(), glm::vec4(1));
-        tileset->DrawTile(batcher, glm::vec2(16,16), 0);
-        
-        for(int y = 0; y < mapHeight; y++)
-        {
-            for(int x = 0; x < mapWidth; x++)
-            {   
-                int tileid = terrain_layer["data"][currentTileIndex];
-                currentTileIndex++;
+                for(int x = 0; x < mapWidth; x++)
+                {   
+                    int tileid = layer["data"][currentTileIndex];
+                    currentTileIndex++;
 
-                if(tileid == 0) continue;
+                    if(tileid == 0) continue;
 
-                tileset->DrawTile(batcher, glm::vec2(x * 16, y * 16), --tileid); // tiled assumes that a ZERO tile id, is a non existing tile.
-                                                                                 // but in our system, we treat the ZERO id as the first one.
-                                                                                 // To fix this, we subtract ONE before drawing.
+                    tileset->DrawTile(batcher, glm::vec2(x * 16, y * 16), --tileid); // tiled assumes that a ZERO tile id, is a non existing tile.
+                                                                                     // but in our system, we treat the ZERO id as the first one.
+                                                                                     // To fix this, we subtract ONE before drawing.
+                }
             }
+            batcher->End();
+            depth += 1;
+            
         }
-        batcher->End();
-        //std::cout << "Tilemap draw: " << currentTileIndex << std::endl;
-        
-        batcher->Begin(shader.get(), camera.get(), glm::vec4(1));
-        batcher->Draw(animation->GetTexture().get(), 0, 0, *animation->GetCurrentFrame());
+            
+        batcher->Begin(shader.get(), camera.get(), glm::vec4(1), -100);
+
+        //batcher->Draw(animation->GetTexture().get(), -8, 0, *animation->GetCurrentFrame());
+        badguy.Render(delta, batcher);
+
         batcher->End();
     };
 
