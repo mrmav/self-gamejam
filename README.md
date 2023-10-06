@@ -10,11 +10,12 @@ The todo list below has items for both the framework and game mixed in.
 ## mvp 1
 - [x] Build animation system; 
 - [x] Build input system; 
-- [x] Add players; 
-- [ ] Ice blocks you are fast; ()
-- [ ] Snow blocks you are slow; ()
-- [ ] Camera zooms out to ensure both players are in the game scene?; ()
-    - If second player falls too behind, looses?
+- [x] Add players;
+- [x] Camera zooms out to ensure both players are in the game scene?;
+- [ ] Add acceleration and drag effect (ice like);
+- [ ] Ice blocks you are fast;
+- [ ] Snow blocks you are slow;
+- [ ] Win condition first one to cross the finish line;
 
 ## mvp 2
 - [ ] Build simple arcade physics engine; 
@@ -23,17 +24,20 @@ The todo list below has items for both the framework and game mixed in.
 - [ ] Obstacles deduct health; 
 
 ## mvp 3
+- [ ] Main menu;
 - [ ] Multiple prebuilt tracks, selectable in the main menu; (mvp, only one track)
     - Requires building a tiled importer for the engine;
     - Also build custom object import;
 
 ## mvp 4
-- [ ] Trails!;
 - [ ] Each player has to collect its color flags to gain points?;
 - [ ] Able to spawn snow flakes so the other player chrashes againts them (soft obstable);
     - For that you need to collect snowballs!
-- [ ] Single player mode;
 
-### Nice to have:
+### Nice to have (unordered list):
+- [ ] Particles!;
+- [ ] Trails!;
+- [ ] Single player mode;
 - [ ] Jumps!
 - [ ] Transporter thinghy as an obstacle.
+
