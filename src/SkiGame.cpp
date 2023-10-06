@@ -6,6 +6,7 @@
 #include "SkiGame.h"
 #include "MapLoader.h"
 #include "Sprite.h"
+#include "Player.h"
 
 using namespace Engine;
 using json = nlohmann::json;
@@ -36,13 +37,16 @@ namespace GameContent
         Rectangle<int>(136, 102, 16, 16)
     };
     AnimationSet badguyAnimationsMap;
+    AnimationSet playerAnimationsMap;
+
+    Player player;
 
     void UpdateDebugCamera(float delta, Ref<Camera2D> camera)
     {
         float speed = 1000.0f;
         float zoomSpeed = 1.0f;
-        camera->Position.x += Input::GetAxisStrength(0, GamePadAxis::GamePadAxisLeftX) * speed * delta;
-        camera->Position.y += Input::GetAxisStrength(0, GamePadAxis::GamePadAxisLeftY) * speed * delta;
+        // camera->Position.x += Input::GetAxisStrength(0, GamePadAxis::GamePadAxisLeftX) * speed * delta;
+        // camera->Position.y += Input::GetAxisStrength(0, GamePadAxis::GamePadAxisLeftY) * speed * delta;
         
         static Cursor mpos;
         static bool dragging = false;
@@ -115,7 +119,7 @@ namespace GameContent
         // std::cout << map_data["version"] << std::endl;
 
         camera = std::make_shared<Camera2D>(GetViewport());
-        camera->Position.z = -100;
+        camera->Zoom = 4;
 
         batcher = std::make_shared<Spritebatch>();
         shader = std::make_shared<Shader>("assets/shaders/vertex.vert", "assets/shaders/fragment.frag");
@@ -134,6 +138,26 @@ namespace GameContent
         };
         badguy = Sprite(8 * 16, 7 * 16, std::make_shared<AnimationSet>(badguyAnimationsMap));
 
+        // test sprites
+        playerAnimationsMap = {
+            {"idle",   FrameAnimation(TILEMAP, badGuyIdleFrames.data(),   2)},
+            {"attack", FrameAnimation(TILEMAP, badGuyAttackFrames.data(), 1)}
+        };
+        
+        // for a keyboard controller:
+        //Ref<InputCursor> playerController = std::make_shared<InputCursor>(Key::Left, Key::Right, Key::Space);
+
+        // for a gamepad controller:
+        //Ref<InputCursor> playerController = std::make_shared<InputCursor>(0, GamePadButton::DPadLeft, GamePadButton::DPadRight, GamePadButton::ButtonA);
+        
+        // for a gamepad controller with axis (sticks):
+        Ref<InputCursor> playerController = std::make_shared<InputCursor>(0, true, GamePadAxis::GamePadAxisLeftX, GamePadButton::ButtonA);
+        
+
+        player = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerAnimationsMap), playerController);
+        player.SetAnimation("idle")->Play();
+        
+
         Input::SetDeadZone(0, 0.2f);
 
     }
@@ -141,8 +165,6 @@ namespace GameContent
     void SkiGame::Update(float delta)
     {   
 
-        UpdateDebugCamera(delta, camera);
-        camera->Update(delta);
 
         if(Input::IsKeyJustDown(Key::N))
         {
@@ -156,6 +178,11 @@ namespace GameContent
         }
 
         badguy.Update(delta);
+        player.Update(delta);
+
+        camera->Position = glm::vec3(player.Position.x, player.Position.y, 0);
+        UpdateDebugCamera(delta, camera);
+        camera->Update(delta);
 
     };
 
@@ -213,6 +240,7 @@ namespace GameContent
 
         //batcher->Draw(animation->GetTexture().get(), -8, 0, *animation->GetCurrentFrame());
         badguy.Render(delta, batcher);
+        player.Render(delta, batcher);
 
         batcher->End();
     };

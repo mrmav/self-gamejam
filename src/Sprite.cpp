@@ -21,7 +21,7 @@ namespace GameContent
 
     }
 
-    void Sprite::Update(float delta) const
+    void Sprite::Update(float delta)
     {
         if(_CurrentAnimation)
         {

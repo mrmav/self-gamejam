@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Engine.h>
 #include <map>
 
@@ -11,7 +13,7 @@ namespace GameContent
     {
     private:
 
-        FrameAnimation* _CurrentAnimation;
+        FrameAnimation* _CurrentAnimation = nullptr;
         Ref<AnimationSet> _Animations;
 
     public:
@@ -23,7 +25,7 @@ namespace GameContent
         Sprite(int x, int y, Ref<AnimationSet> animations);
         ~Sprite() { };
 
-        void Update(float delta) const;
+        void Update(float delta);
         void Render(float delta, Ref<Spritebatch> batcher) const;
 
         FrameAnimation* SetAnimation(std::string animationName);
