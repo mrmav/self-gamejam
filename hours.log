@@ -11,3 +11,23 @@
     
     22.00 - 00.54:
         Implementation of the FrameAnimations
+
+05.10.2024:
+
+    - Engine:
+        - Added json lib;
+        - Added FrameAnimations;
+    
+    - Game
+        - Tested things with tiled;
+        - Importing and rendering map;
+        - Added sprites with animations;
+        - cmake stuff;
+    
+    10h total (+-)
+
+
+06.10.2024:
+
+    
+
