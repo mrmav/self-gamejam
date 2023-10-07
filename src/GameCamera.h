@@ -19,6 +19,7 @@ namespace GameContent
 
         void Update(float delta, Player& pone, Player& ptwo);
         void UpdateInGameCamera(float delta, Player& pone, Player& ptwo);
+        Rectangle<float> GetPlayersBoundingBox(Player& pone, Player& ptwo);
 
         private:
 
