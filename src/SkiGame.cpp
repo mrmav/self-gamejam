@@ -123,10 +123,10 @@ namespace GameContent
         Ref<InputCursor> playerOneController = std::make_shared<InputCursor>(0, true, GamePadAxis::GamePadAxisLeftX, GamePadButton::ButtonA);
         
 
-        playerOne = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerOneAnimationsMap), playerOneController, &map);
+        playerOne = Player(14 * 16, 2 * 16, std::make_shared<AnimationSet>(playerOneAnimationsMap), playerOneController, &map);
         playerOne.SetAnimation("ski")->Play();
 
-        playerTwo = Player(14 * 16, 2 * 16, std::make_shared<AnimationSet>(playerTwoAnimationsMap), playerTwoController, &map);
+        playerTwo = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerTwoAnimationsMap), playerTwoController, &map);
         playerTwo.SetAnimation("ski")->Play();
         
 

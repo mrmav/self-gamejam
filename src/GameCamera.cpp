@@ -7,6 +7,16 @@ namespace GameContent
     const int MIN_DISPLAY_WIDTH_TILES = 12;
     const int MAX_DISPLAY_WIDTH_TILES = 30;
 
+
+    /*
+    
+    The camera would ideally never leave the world bounds.
+    When a player is ahead of another player, the player follows it.
+    If a player gets to behind, the player ahead wins.
+
+    */
+
+
     GameCamera::GameCamera(Viewport& viewport, MapLoader& map)
         : Camera2D(viewport), _Map(map)
     {
@@ -23,12 +33,24 @@ namespace GameContent
         Camera2D::Update(delta);
     }
 
+    glm::vec2 GameCamera::GetCenterPoint(glm::vec2& p1, glm::vec2& p2) const
+    {
+        float horizontalPosition = p1.x + (p2 - p1).x / 2.0f + _Map.GetTileSize().x / 2.0f;
+        float lowestY = std::max(p1.y, p2.y) + _Map.GetTileSize().y;
+
+        glm::vec2 newcenter = glm::vec2(horizontalPosition, lowestY);
+
+        return newcenter;
+
+    }
+
     void GameCamera::UpdateInGameCamera(float delta, Player& pone, Player& ptwo)
     {
         // Calculate the desired camera center: (this would be inbetween the players)
-        glm::vec2 deltaDistance = pone.Position - ptwo.Position + _Map.GetTileSize(); // must add the tile offset
+        // glm::vec2 deltaDistance = pone.Position - ptwo.Position + _Map.GetTileSize(); // must add the tile offset
 
         //glm::vec2 center = (pone.Position + ptwo.Position) * 0.5f;
+        //glm::vec2 midPoint = GetCenterPoint(pone.Position, ptwo.Position);
 
         // Get the bounding rect
         Rectangle<float> boundingRect = GetPlayersBoundingBox(pone, ptwo);
@@ -51,40 +73,44 @@ namespace GameContent
 
         // Take world edges into account, not allowing to show outside of map
         // But maintain dynamic zoom:        
-        // uint32_t worldWidth  = _Map.GetWorldSize().x;
-        // uint32_t worldHeight = _Map.GetWorldSize().y;
-        // if (midPoint.x - cameraViewportWidth / 2.0f < 0)
-        // {
-        //     float diff = cameraViewportWidth / 2.0f - midPoint.x;
-        //     midPoint.x += std::abs(diff);
-        // }
-        // else if (midPoint.x + cameraViewportWidth / 2.0f > worldWidth)
-        // {
-        //     float diff = worldWidth - (midPoint.x + cameraViewportWidth / 2.0f);
-        //     midPoint.x -= std::abs(diff);
-        // }
+        uint32_t worldWidth  = _Map.GetWorldSize().x;
+        uint32_t worldHeight = _Map.GetWorldSize().y;
+        if (midPoint.x - cameraViewportWidth / 2.0f < 0)
+        {
+            float diff = cameraViewportWidth / 2.0f - midPoint.x;
+            midPoint.x += std::abs(diff);            
 
-        // if (midPoint.y - cameraViewportHeight / 2.0f < 0)
-        // {
-        //     float diff = cameraViewportHeight / 2.0f - midPoint.y;
-        //     midPoint.y += std::abs(diff);
-        // }
-        // else if (midPoint.y + cameraViewportHeight / 2.0f > worldHeight)
-        // {
-        //     float diff = worldHeight - (midPoint.y + cameraViewportHeight / 2.0f);
-        //     midPoint.y -= std::abs(diff);
-        // }
+        }
+        else if (midPoint.x + cameraViewportWidth / 2.0f > worldWidth)
+        {
+            float diff = worldWidth - (midPoint.x + cameraViewportWidth / 2.0f);
+            midPoint.x -= std::abs(diff);
+        }
 
-        // sets the new zoom based on the calculated new rect
-        //Zoom = static_cast<float>(GetViewport().Width()) / static_cast<float>(cameraViewportWidth);
+        if (midPoint.y - cameraViewportHeight / 2.0f < 0)
+        {
+            float diff = cameraViewportHeight / 2.0f - midPoint.y;
+            midPoint.y += std::abs(diff);
+
+        }
+        else if (midPoint.y + cameraViewportHeight / 2.0f > worldHeight)
+        {
+            float diff = worldHeight - (midPoint.y + cameraViewportHeight / 2.0f);
+            midPoint.y -= std::abs(diff);
+        }
+
+        //sets the new zoom based on the calculated new rect
+        Zoom = static_cast<float>(GetViewport().Width()) / static_cast<float>(cameraViewportWidth);
         
         
-        glm::vec2 center = (pone.Position + ptwo.Position) * 0.5f;
+        // glm::vec2 center = (pone.Position + ptwo.Position) * 0.5f;
         float distance = glm::distance(pone.Position, ptwo.Position);
         float desiredZoom = static_cast<float>(GetViewport().Width()) / (distance * 2.0f);
         Zoom = desiredZoom;
 
-        Position = glm::vec3(center.x, center.y, 0);
+        _ENGINE_LOG("BaseCamera", "DistancePlayers: " << glm::to_string(midPoint))
+
+        Position = glm::vec3(midPoint.x, midPoint.y, 0);
 
     }
 
