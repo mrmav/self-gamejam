@@ -46,14 +46,10 @@ namespace GameContent
                 _Kinematics = &kineticIceMaterial;
             }
 
-        } else
-        {
-            //_ENGINE_LOG("PLayer", "tile out of bounds " << tileIndex);
         }
 
+        HandleVulnerability();
 
-
-        //_ENGINE_LOG("player", "stepping on tile id " << tileID);
 
         _Acceleration.x = 0;
         _Acceleration.y = 0;
@@ -74,12 +70,11 @@ namespace GameContent
         if(_Controller->IsKeyJustDown(ActionsIndex::ACTION))
         {
             glm::vec2 dir = glm::normalize(_Velocity);
-            _Acceleration += dir * 1000.0f;
+            _Acceleration += dir * 4000.0f;
             
             if(!(_CurrentAnimation->IsPlaying()))
                 SetAnimation("ski")->Play();
 
-            _ENGINE_LOG("player", "accelerate! " << glm::to_string(_Acceleration) << ", direction: " << glm::to_string(_Velocity))
         }
 
         // Apply
@@ -112,13 +107,73 @@ namespace GameContent
             Position.x = _LoadedMap->GetWorldSize().x - _LoadedMap->GetTileSize().x;
         }
 
-        if(!_Controller->IsGamePad())
-        {
-            //_ENGINE_LOG("Player", "Acceleration: " << glm::to_string(_Acceleration) << "Velocity: " << glm::to_string(_Velocity));
-        }
-
         // Update animations and such:
         Sprite::Update(delta);
     }
+
+    bool Player::IsColliding() const
+    {
+        std::vector<glm::ivec2> corners;
+        corners.push_back(Position / _LoadedMap->GetTileSize());  //worldTilePositionTopLeft    
+        corners.push_back(glm::vec2(Position.x + _LoadedMap->GetTileSize().x, Position.y) / _LoadedMap->GetTileSize());  //worldTilePositionTopRight   
+        corners.push_back(glm::vec2(Position.x, Position.y + _LoadedMap->GetTileSize().y) / _LoadedMap->GetTileSize());  //worldTilePositionBottomLeft 
+        corners.push_back(glm::vec2(Position.x + _LoadedMap->GetTileSize().x, Position.y + _LoadedMap->GetTileSize().y) + _LoadedMap->GetTileSize().y);  //worldTilePositionBottomRight
+        
+        for(auto& corner : corners)
+        {
+            int tileIndex = corner.y * static_cast<int>(_LoadedMap->GetWorldTileSize().x) + corner.x;
+
+            if (tileIndex > _LoadedMap->GetTerrainData().size() - 1) continue;
+
+            int tileID = _LoadedMap->GetCollisionData()[tileIndex];
+            if( tileID != 0)
+            {                
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
+    void Player::Hurt()
+    {
+        if(!_Vulnerable) return;
+
+        _Health--;
+
+        _Vulnerable = false;
+        _VulnerableTimer = Timer::Get();
+        _VulnerableTimeSince = _VulnerableTimer - _FlashRate;
+        
+    }
+
+    void Player::HandleVulnerability()
+    {
+        if(_VulnerableTimer + _VulnerableRate < Timer::Get())
+        {
+            _Vulnerable = true;
+            TintColor = glm::vec4(1);
+        }
+
+        if(IsColliding())
+        {
+            Hurt();
+        };
+
+        if(!_Vulnerable)
+        {   
+
+            if(Timer::Get() > _VulnerableTimeSince + _FlashRate)
+            {
+                _VulnerableTimeSince = Timer::Get() + _FlashRate;
+                TintColor = _Tinted ? glm::vec4(1) : glm::vec4(1, 0.541176, 0.513725, 1);
+                _Tinted = !_Tinted;
+            }
+        
+        }
+    }
+
 
 } // namespace GameContent

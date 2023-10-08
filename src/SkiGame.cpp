@@ -18,6 +18,7 @@ using AnimationSet = std::map<std::string, FrameAnimation>;
 namespace GameContent
 {   
     Player SkiGame::nullPlayer = Player();
+    Player SkiGame::drawPlayer = Player();
 
     Viewport gameViewport;
     Ref<GameCamera> camera;
@@ -96,7 +97,7 @@ namespace GameContent
         TILEMAP = std::make_shared<Texture2D>("assets/kenney_tiny-ski/Tilemap/tilemap.png", TextureParams());
         tileset = std::make_shared<TileSet>(TILEMAP, 12, 0, 16, 16, 0, 1);
 
-        font = std::make_shared<BitmapFont>("assets/mbf_small_00.png", 7, 7);
+        font = std::make_shared<BitmapFont>("assets/font.png", 16, 16);
 
         // animation = std::make_shared<FrameAnimation>(TILEMAP, frames.data(), 3);
         // animation->loop = true;
@@ -129,14 +130,14 @@ namespace GameContent
 
         playerOne = Player(14 * 16, 2 * 16, std::make_shared<AnimationSet>(playerOneAnimationsMap), playerOneController, &map);
         playerOne.SetAnimation("ski")->Play();
-        playerOne.Name = "Player One";
-        playerOne.Color = glm::vec4(0.819608f, 0.462745f, 0.815686, 1.0f);        
+        playerOne.Name = "1";
+        playerOne.Color = glm::vec4(0.819608f, 0.462745f, 0.815686, 1);        
         
 
         playerTwo = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerTwoAnimationsMap), playerTwoController, &map);
         playerTwo.SetAnimation("ski")->Play();
-        playerTwo.Name = "Player Two";
-        playerTwo.Color = glm::vec4(0.517647f, 0.776471f, 0.411765, 1.0f);
+        playerTwo.Name = "2";
+        playerTwo.Color = glm::vec4(0.517647f, 0.776471f, 0.411765, 1);
 
         Input::SetDeadZone(0, 0.2f);
 
@@ -217,57 +218,97 @@ namespace GameContent
             depth += 1;
             
         }
-            
-        batcher->Begin(shader.get(), camera.get(), glm::vec4(1), -100);
 
-        //batcher->Draw(animation->GetTexture().get(), -8, 0, *animation->GetCurrentFrame());
-        badguy.Render(delta, batcher);
-        playerOne.Render(delta, batcher);
-        playerTwo.Render(delta, batcher);
-
-        // render players labels     
-        // batcher->DrawString(font.get(), playerOne.Position.x, playerOne.Position.y - 9, playerOne.Name.c_str());
-        // batcher->DrawString(font.get(), playerTwo.Position.x, playerTwo.Position.y - 9, playerTwo.Name.c_str());
-
-        batcher->End();
-
-        // Render players labels.
-        // I have to render in separate batchs because i want different tints.
-        // I can improve this in the future in the framework...
-
-        batcher->Begin(shader.get(), camera.get(), playerOne.Color);
-        batcher->DrawString(font.get(), playerOne.Position.x, playerOne.Position.y - 9, playerOne.Name.c_str());
-        batcher->End();
-
-        batcher->Begin(shader.get(), camera.get(), playerTwo.Color);
-        batcher->DrawString(font.get(), playerTwo.Position.x, playerTwo.Position.y - 9, playerTwo.Name.c_str());
-        batcher->End();
-
+        DrawPlayerWorld(batcher, playerOne, delta);
+        DrawPlayerWorld(batcher, playerTwo, delta);
 
         // Render UI stuff with the custom transform
-        batcher->SetCustomView(glm::mat4(1) * glm::scale(glm::vec3(4.0f)));
+        float UIScale = 4.0f;
+        batcher->SetCustomView(glm::mat4(1) * glm::scale(glm::vec3(UIScale)));
+
+        // render player health
+        batcher->Begin(shader.get(), camera.get(), glm::vec4(1), 0, true);
+        DrawPlayerHealth(batcher, playerOne, glm::vec2(8, 8), 1);
+        DrawPlayerHealth(batcher, playerTwo, glm::vec2(GetViewport().Width() / UIScale - 9 - 8, 8), -1);
+        batcher->End();
+
 
         // Render winning string:
         if(winningPlayer != &nullPlayer)
         {
             batcher->Begin(shader.get(), camera.get(), winningPlayer->Color, 0, true);
-            batcher->DrawString(font.get(), 16 / 4.0f, 16 / 4.0f, (winningPlayer->Name + std::string(" wins!")).c_str());
+
+            std::string str = std::string("Player ") + winningPlayer->Name;
+            glm::vec2 strSize = font->GetStringSize(str);
+            glm::vec2 UIDisplaySize = glm::vec2(GetViewport().Width(), GetViewport().Height()) / UIScale;
+            
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f, str.c_str());
+            
+            str = "Wins!";
+            strSize = font->GetStringSize(str);
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 16.0f, str.c_str());
+
             batcher->End();
         }
 
 
     };
 
+    void SkiGame::DrawPlayerHealth(Ref<Spritebatch> batcher, Player const& player, glm::vec2 start, int dir) const
+    {      
+        float offset = 1;
+
+        for(int i = 0; i < player.GetHealth(); i++)
+        {   
+            float x = start.x + ((9 + offset) * i) * dir;
+            batcher->Draw(TILEMAP.get(), x, start.y, Rectangle<int>(136, 53, 9, 9));            
+
+        }
+    }
+
     Player* SkiGame::CheckWinningCondition(MapLoader& world, Player& pone, Player& ptwo)
     {
         float maxY = glm::max(pone.Position.y, ptwo.Position.y);
+        
+        Player* result = &nullPlayer;
 
+        // check win by player death;
+        if(pone.GetHealth() == 0)
+        {
+            result = &ptwo;
+        }
+        if(ptwo.GetHealth() == 0)
+        {
+            if(result == &ptwo) return &drawPlayer;
+            result = &pone;
+        }
+
+        if(result != &nullPlayer) return result;
+
+        // check win by player finish
         if (maxY > world.GetWorldSize().y)
         {
             return pone.Position.y > ptwo.Position.y ? &pone : &ptwo;
         }
 
         return &nullPlayer;
+    }
+
+    void SkiGame::DrawPlayerWorld(Ref<Spritebatch> batcher, Player& p, float delta)
+    {
+        if(p.GetHealth() > 0)
+        {
+            batcher->Begin(shader.get(), camera.get(), p.TintColor);
+            p.Render(delta, batcher);
+            batcher->End();
+
+            // Render players labels.
+            // I have to render in separate batchs because i want different tints.
+            // I can improve this in the future in the framework...
+            batcher->Begin(shader.get(), camera.get(), glm::vec4(p.Color.r, p.Color.g, p.Color.b, 0.6f));
+            batcher->DrawString(font.get(), p.Position.x, p.Position.y - 20, p.Name.c_str());
+            batcher->End();
+        }
     }
 
 }

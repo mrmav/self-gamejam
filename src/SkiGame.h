@@ -38,7 +38,10 @@ namespace GameContent
         void Render(float delta) override;
 
         static Player nullPlayer;
+        static Player drawPlayer;
         Player* CheckWinningCondition(MapLoader& world, Player& pone, Player& ptwo);
-        
+        void DrawPlayerHealth(Ref<Spritebatch> batcher, Player const& player, glm::vec2 start, int dir) const;
+        void DrawPlayerWorld(Ref<Spritebatch> batcher, Player& p, float delta);
+
     };
 }

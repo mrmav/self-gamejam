@@ -17,11 +17,12 @@ The todo list below has items for both the framework and game mixed in.
 - [x] Snow blocks you are slow; (needs tweaking)
 - [x] Win condition first one to cross the finish line;
 
-## MVP 2
-- [ ] Build simple arcade physics engine; 
-    - Maybe just overlap tests are needed.
-- [ ] Each player has an health amount; 
-- [ ] Obstacles deduct health; 
+## ![Static Badge](https://img.shields.io/badge/tag-mvp2-blue)  MVP 2 :beers::partying_face:
+- [ ] ~~Build simple arcade physics engine;~~
+    - ~~Maybe just overlap tests are needed.~~
+- [x] Implemented collisions based on a tilemap;
+- [x] Each player has an health amount; 
+- [x] Obstacles deduct health; 
 
 ## MVP 3
 - [ ] Main menu;

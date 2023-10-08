@@ -34,6 +34,11 @@ namespace GameContent
             {
                 _TerrainLayerData = layer.at("data").get<std::vector<int>>();
             }
+            if(layer["name"] == std::string("CollidableObjects"))
+            {
+                _CollisionLayerData = layer.at("data").get<std::vector<int>>();
+                _ENGINE_LOG("MapLoader", "Added collision data.")
+            }
             
         }
 
@@ -47,4 +52,5 @@ namespace GameContent
         }
         return false;
     };
+
 }
