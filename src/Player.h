@@ -73,6 +73,10 @@ namespace GameContent
                 Position += distance;
             }
 
+            std::string Name;
+            glm::vec4 Color;
+
             void Update(float delta);
     };
+
 }
