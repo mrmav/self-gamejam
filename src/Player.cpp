@@ -175,5 +175,19 @@ namespace GameContent
         }
     }
 
+    void Player::Reset()
+    {
+        _Health = 3;
+        _Vulnerable = true;
+        _VulnerableTimer = 0;
+        _VulnerableTimeSince = 0;
+        _VulnerableRate = 3;  // seconds
+        _FlashRate = 0.05;
+        _Tinted = false;
+        
+        _Acceleration = glm::vec2(0.0f, 0.0f);
+        _Velocity     = glm::vec2(0.0f, 0.0f);
+    }
+
 
 } // namespace GameContent

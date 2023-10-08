@@ -42,6 +42,8 @@ namespace GameContent
         Player* CheckWinningCondition(MapLoader& world, Player& pone, Player& ptwo);
         void DrawPlayerHealth(Ref<Spritebatch> batcher, Player const& player, glm::vec2 start, int dir) const;
         void DrawPlayerWorld(Ref<Spritebatch> batcher, Player& p, float delta);
+        
+        void Reset();
 
     };
 }

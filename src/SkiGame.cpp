@@ -165,7 +165,13 @@ namespace GameContent
         camera->Update(delta, playerOne, playerTwo);
 
 
-        winningPlayer = CheckWinningCondition(map, playerOne, playerTwo);
+        if(winningPlayer != &nullPlayer && (Input::IsKeyJustDown(Key::R) || Input::IsButtonJustDown(0, GamePadButton::Start)))
+        {
+            Reset();
+        }
+
+        if(winningPlayer == &nullPlayer)
+            winningPlayer = CheckWinningCondition(map, playerOne, playerTwo);
         
     };
 
@@ -218,6 +224,10 @@ namespace GameContent
             depth += 1;
             
         }
+        batcher->Begin(shader.get(), camera.get(), glm::vec4(1));
+        badguy.Render(delta, batcher);
+        batcher->End();
+
 
         DrawPlayerWorld(batcher, playerOne, delta);
         DrawPlayerWorld(batcher, playerTwo, delta);
@@ -248,6 +258,18 @@ namespace GameContent
             strSize = font->GetStringSize(str);
             batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 16.0f, str.c_str());
 
+            str = "Restart: r";
+            strSize = font->GetStringSize(str);
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f, str.c_str());
+
+            str = "or gamepad";
+            strSize = font->GetStringSize(str);
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f + 16.0f, str.c_str());
+
+            str = "start";
+            strSize = font->GetStringSize(str);
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f + 32.0f, str.c_str());
+
             batcher->End();
         }
 
@@ -268,6 +290,7 @@ namespace GameContent
 
     Player* SkiGame::CheckWinningCondition(MapLoader& world, Player& pone, Player& ptwo)
     {
+        
         float maxY = glm::max(pone.Position.y, ptwo.Position.y);
         
         Player* result = &nullPlayer;
@@ -309,6 +332,20 @@ namespace GameContent
             batcher->DrawString(font.get(), p.Position.x, p.Position.y - 20, p.Name.c_str());
             batcher->End();
         }
+    }
+
+    void SkiGame::Reset()
+    {
+        playerOne.Reset();
+        playerTwo.Reset();
+
+        playerOne.SetAnimation("ski")->Play();
+        playerTwo.SetAnimation("ski")->Play();
+
+        playerOne.Position = glm::vec2(14 * 16, 2 * 16);
+        playerTwo.Position = glm::vec2(16 * 16, 2 * 16);
+
+        winningPlayer = &nullPlayer;
     }
 
 }

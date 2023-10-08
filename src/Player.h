@@ -94,6 +94,8 @@ namespace GameContent
             glm::vec4 TintColor = glm::vec4(1);
 
             void Update(float delta);
+
+            void Reset();
     };
 
 }
