@@ -2,13 +2,14 @@
 
 namespace GameContent
 {
+    
     KinematicMaterial kineticIceMaterial = KinematicMaterial(
         // sideForce, slideForce, friction, maxSideMoveSpeed, maxSlideSpeed
         80.0f, 10.0f, 0.9f, 300.0f, 250.0f
     );
 
     KinematicMaterial kineticSnowMaterial = KinematicMaterial(
-        80.0f, 10.0f, 0.2f, 300.0f, 250.0f
+        100.0f, 5.0f, 0.6f, 200.0f, 200.0f
     );
 
     Player::Player(int x, int y, Ref<AnimationSet> animations, Ref<InputCursor> controller, MapLoader* map)
@@ -47,7 +48,7 @@ namespace GameContent
 
         } else
         {
-            _ENGINE_LOG("PLayer", "tile out of bounds " << tileIndex);
+            //_ENGINE_LOG("PLayer", "tile out of bounds " << tileIndex);
         }
 
 
