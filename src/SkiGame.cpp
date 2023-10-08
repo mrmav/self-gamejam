@@ -17,6 +17,7 @@ using AnimationSet = std::map<std::string, FrameAnimation>;
 
 namespace GameContent
 {   
+    Player SkiGame::nullPlayer = Player();
 
     Viewport gameViewport;
     Ref<GameCamera> camera;
@@ -58,8 +59,9 @@ namespace GameContent
 
     Player playerOne;
     Player playerTwo;
+    Player* winningPlayer = &SkiGame::nullPlayer;
 
-    
+    Ref<BitmapFont> font;
 
     SkiGame::SkiGame(uint32_t screenWidth, uint32_t screenHeight, const char* windowTitle)
         : Engine::Game(screenWidth, screenHeight, windowTitle)
@@ -94,6 +96,8 @@ namespace GameContent
         TILEMAP = std::make_shared<Texture2D>("assets/kenney_tiny-ski/Tilemap/tilemap.png", TextureParams());
         tileset = std::make_shared<TileSet>(TILEMAP, 12, 0, 16, 16, 0, 1);
 
+        font = std::make_shared<BitmapFont>("assets/mbf_small_00.png", 7, 7);
+
         // animation = std::make_shared<FrameAnimation>(TILEMAP, frames.data(), 3);
         // animation->loop = true;
         // animation->SetFps(6);
@@ -125,10 +129,14 @@ namespace GameContent
 
         playerOne = Player(14 * 16, 2 * 16, std::make_shared<AnimationSet>(playerOneAnimationsMap), playerOneController, &map);
         playerOne.SetAnimation("ski")->Play();
+        playerOne.Name = "Player One";
+        playerOne.Color = glm::vec4(0.819608f, 0.462745f, 0.815686, 1.0f);        
+        
 
         playerTwo = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerTwoAnimationsMap), playerTwoController, &map);
         playerTwo.SetAnimation("ski")->Play();
-        
+        playerTwo.Name = "Player Two";
+        playerTwo.Color = glm::vec4(0.517647f, 0.776471f, 0.411765, 1.0f);
 
         Input::SetDeadZone(0, 0.2f);
 
@@ -154,6 +162,9 @@ namespace GameContent
         playerTwo.Update(delta);
 
         camera->Update(delta, playerOne, playerTwo);
+
+
+        winningPlayer = CheckWinningCondition(map, playerOne, playerTwo);
         
     };
 
@@ -214,9 +225,49 @@ namespace GameContent
         playerOne.Render(delta, batcher);
         playerTwo.Render(delta, batcher);
 
+        // render players labels     
+        // batcher->DrawString(font.get(), playerOne.Position.x, playerOne.Position.y - 9, playerOne.Name.c_str());
+        // batcher->DrawString(font.get(), playerTwo.Position.x, playerTwo.Position.y - 9, playerTwo.Name.c_str());
+
         batcher->End();
+
+        // Render players labels.
+        // I have to render in separate batchs because i want different tints.
+        // I can improve this in the future in the framework...
+
+        batcher->Begin(shader.get(), camera.get(), playerOne.Color);
+        batcher->DrawString(font.get(), playerOne.Position.x, playerOne.Position.y - 9, playerOne.Name.c_str());
+        batcher->End();
+
+        batcher->Begin(shader.get(), camera.get(), playerTwo.Color);
+        batcher->DrawString(font.get(), playerTwo.Position.x, playerTwo.Position.y - 9, playerTwo.Name.c_str());
+        batcher->End();
+
+
+        // Render UI stuff with the custom transform
+        batcher->SetCustomView(glm::mat4(1) * glm::scale(glm::vec3(4.0f)));
+
+        // Render winning string:
+        if(winningPlayer != &nullPlayer)
+        {
+            batcher->Begin(shader.get(), camera.get(), winningPlayer->Color, 0, true);
+            batcher->DrawString(font.get(), 16 / 4.0f, 16 / 4.0f, (winningPlayer->Name + std::string(" wins!")).c_str());
+            batcher->End();
+        }
+
+
     };
 
-    
+    Player* SkiGame::CheckWinningCondition(MapLoader& world, Player& pone, Player& ptwo)
+    {
+        float maxY = glm::max(pone.Position.y, ptwo.Position.y);
+
+        if (maxY > world.GetWorldSize().y)
+        {
+            return pone.Position.y > ptwo.Position.y ? &pone : &ptwo;
+        }
+
+        return &nullPlayer;
+    }
 
 }
