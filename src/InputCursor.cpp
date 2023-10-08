@@ -42,10 +42,21 @@ namespace GameContent
             if (_GamePadID >= 0)
             {
                 _KeyStates[i] = Input::IsButtonPressed(_GamePadID, _KeyCodes[i]);
-                _GamePadAxis = Input::GetAxisStrength(_GamePadID, _AxisCode);
+                _KeyJustDownStates[i] = Input::IsButtonJustDown(_GamePadID, _KeyCodes[i]);
+
+                if(this->_GamePadUseAxis)
+                {
+                    _GamePadAxis = Input::GetAxisStrength(_GamePadID, _AxisCode);
+                } else
+                {
+                    _GamePadAxis = IsKeyDown(ActionsIndex::LEFT)  ? -1 : 0;
+                    _GamePadAxis = IsKeyDown(ActionsIndex::RIGHT) ?  1 : _GamePadAxis;
+                }
+
             } else
             {
                 _KeyStates[i] = Input::IsKeyPressed(_KeyCodes[i]);
+                _KeyJustDownStates[i] = Input::IsKeyJustDown(_KeyCodes[i]);
             }
         }
     }
@@ -55,9 +66,14 @@ namespace GameContent
         return _KeyStates[static_cast<std::size_t>(code)];
     }
 
+    bool InputCursor::IsKeyJustDown(ActionsIndex code) const
+    {
+        return _KeyJustDownStates[static_cast<std::size_t>(code)];
+    }
+
     float InputCursor::GetAxis() const
     {
-        if(!_GamePadUseAxis) return 0;
+        if(!(_GamePadID >= 0)) return 0;
 
         return _GamePadAxis;
     }

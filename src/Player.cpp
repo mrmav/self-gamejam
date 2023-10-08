@@ -5,11 +5,11 @@ namespace GameContent
     
     KinematicMaterial kineticIceMaterial = KinematicMaterial(
         // sideForce, slideForce, friction, changeDirectionForce, maxSideMoveSpeed, maxSlideSpeed
-        80.0f, 10.0f, 0.9f, -4.0f, 300.0f, 250.0f
+        80.0f, 10.0f, 0.9f, 0.3f, 300.0f, 250.0f
     );
 
     KinematicMaterial kineticSnowMaterial = KinematicMaterial(
-        100.0f, 6.0f, 0.4f, 0.0f, 200.0f, 100.0f
+        100.0f, 6.0f, 0.4f, 0.9f, 200.0f, 100.0f
     );
 
     Player::Player(int x, int y, Ref<AnimationSet> animations, Ref<InputCursor> controller, MapLoader* map)
@@ -55,7 +55,11 @@ namespace GameContent
 
         //_ENGINE_LOG("player", "stepping on tile id " << tileID);
 
+        _Acceleration.x = 0;
+        _Acceleration.y = 0;
+
         int dir = 0;
+        bool accelerate = false;
         if(_Controller->IsGamePad())
         {   
             if(_Controller->GetAxis() > 0)      dir =  1;
@@ -67,9 +71,34 @@ namespace GameContent
             if(_Controller->IsKeyDown(ActionsIndex::RIGHT)) dir =  1;
         }
 
+        if(_Controller->IsKeyJustDown(ActionsIndex::ACTION))
+        {
+            glm::vec2 dir = glm::normalize(_Velocity);
+            _Acceleration += dir * 1000.0f;
+            
+            if(!(_CurrentAnimation->IsPlaying()))
+                SetAnimation("ski")->Play();
+
+            _ENGINE_LOG("player", "accelerate! " << glm::to_string(_Acceleration) << ", direction: " << glm::to_string(_Velocity))
+        }
+
         // Apply
         _Kinematics->CalculateContribution(delta, dir, _Acceleration, _Velocity);
         _Velocity += _Acceleration;
+
+
+        // moving direction
+        int movingDirectionSide = _Velocity.x > 0 ? 1 : -1;
+        
+        // deceleration based on abrupt acceleration changes
+        if (dir != 0 && dir != movingDirectionSide)
+        {
+            //  direction change, should decrease the descending force
+            //float brakeForce = ChangingSpeedBreakForce;
+            float brakeDamping = 0.2f;
+            _Velocity *= std::pow(brakeDamping, delta);
+        }
+
         _Kinematics->CapVelocity(_Velocity);
 
         // decay over time

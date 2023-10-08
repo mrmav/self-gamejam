@@ -15,13 +15,6 @@ namespace GameContent
         COUNT
     };
 
-    enum class GamePadAxisActionsIndex
-    {
-        LEFT = 0,
-        RIGHT,
-        COUNT
-    };
-
 
     /// @brief This class represents a set of keys to act as a cursor
     /// It takes two keys for left or right, and another for action.    
@@ -32,6 +25,7 @@ namespace GameContent
 
         std::vector<uint16_t> _KeyCodes = std::vector<uint16_t>(static_cast<std::size_t>(ActionsIndex::COUNT), 0);
         std::vector<bool> _KeyStates = std::vector<bool>(static_cast<std::size_t>(ActionsIndex::COUNT), false);
+        std::vector<bool> _KeyJustDownStates = std::vector<bool>(static_cast<std::size_t>(ActionsIndex::COUNT), false);
 
         int _GamePadID = -1;
         bool _GamePadUseAxis = false;
@@ -54,6 +48,7 @@ namespace GameContent
         bool IsKeyDown(ActionsIndex code) const;
         float GetAxis() const;
         bool IsGamePad() const {return _GamePadID > -1; };
+        bool IsKeyJustDown(ActionsIndex code) const;
 
     };
 

@@ -11,7 +11,7 @@ namespace GameContent
 {
     class Sprite
     {
-    private:
+    protected:
 
         FrameAnimation* _CurrentAnimation = nullptr;
         Ref<AnimationSet> _Animations;

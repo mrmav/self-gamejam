@@ -12,13 +12,13 @@ namespace GameContent
         const float SideMoveForce;
         const float SlideForce;
         const float Friction;
-        const float ChangingSpeedBreakForce;
+        const float ChangingSpeedBreakDamping;
 
         const float MaxSideMoveSpeed;
         const float MaxSlideSpeed;        
 
-        KinematicMaterial(float sideForce, float slideForce, float friction, float changeSpeedForce, float maxSideMoveSpeed, float maxSlideSpeed)
-            : SideMoveForce(sideForce), SlideForce(slideForce), Friction(friction), ChangingSpeedBreakForce(changeSpeedForce),
+        KinematicMaterial(float sideForce, float slideForce, float friction, float changeSpeedDamp, float maxSideMoveSpeed, float maxSlideSpeed)
+            : SideMoveForce(sideForce), SlideForce(slideForce), Friction(friction), ChangingSpeedBreakDamping(changeSpeedDamp),
             MaxSideMoveSpeed(maxSideMoveSpeed), MaxSlideSpeed(maxSlideSpeed)
         {
 
@@ -26,22 +26,10 @@ namespace GameContent
 
         void CalculateContribution(float delta, int direction, glm::vec2& acceleration, glm::vec2 const& velocity)
         {   
-            acceleration.x = direction * SideMoveForce;
-            acceleration.y = SlideForce;
-
-            // moving direction
-            int movingDirectionSide = velocity.x > 0 ? 1 : -1;
-            
-            // deceleration based on abrupt acceleration changes
-            if (direction != 0 && direction != movingDirectionSide)
-            {
-                //  direction change, should decrease the descending force
-                float brakeForce = ChangingSpeedBreakForce;
-                acceleration.y += brakeForce;
-            }
+            acceleration.x += direction * SideMoveForce;
+            acceleration.y += SlideForce;
 
             acceleration *= delta;
-
         }
 
         void CapVelocity(glm::vec2& velocity)
