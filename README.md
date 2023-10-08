@@ -7,7 +7,7 @@ This game uses the [little framework](https://github.com/mrmav/simple-cpp-engine
 
 The todo list below has items for both the framework and game mixed in.
 
-## mvp 1
+## ![Static Badge](https://img.shields.io/badge/tag-mvp1-blue) MVP 1 :beers::partying_face: 
 - [x] Build animation system; 
 - [x] Build game-centric input system; 
 - [x] Add players;
@@ -17,19 +17,19 @@ The todo list below has items for both the framework and game mixed in.
 - [x] Snow blocks you are slow; (needs tweaking)
 - [x] Win condition first one to cross the finish line;
 
-## mvp 2
+## MVP 2
 - [ ] Build simple arcade physics engine; 
     - Maybe just overlap tests are needed.
 - [ ] Each player has an health amount; 
 - [ ] Obstacles deduct health; 
 
-## mvp 3
+## MVP 3
 - [ ] Main menu;
 - [ ] Multiple prebuilt tracks, selectable in the main menu; (mvp, only one track)
     - Requires building a tiled importer for the engine;
     - Also build custom object import;
 
-## mvp 4
+## MVP 4
 - [ ] Each player has to collect its color flags to gain points?;
 - [ ] Able to spawn snow flakes so the other player crashes against them (soft obstacle);
     - For that you need to collect snowballs!
