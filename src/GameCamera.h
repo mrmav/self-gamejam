@@ -20,7 +20,8 @@ namespace GameContent
         void Update(float delta, Player& pone, Player& ptwo);
         void UpdateInGameCamera(float delta, Player& pone, Player& ptwo);
         Rectangle<float> GetPlayersBoundingBox(Player& pone, Player& ptwo);
-        glm::vec2 GetCenterPoint(glm::vec2& p1, glm::vec2& p2) const;
+        void ZoomToFit(Rectangle<float>& rect);
+        void HandleWorldBounds();
 
         private:
 
