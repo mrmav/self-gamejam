@@ -15,7 +15,7 @@ The todo list below has items for both the framework and game mixed in.
 - [x] Add acceleration and drag effect (ice like);
 - [x] Ice blocks you are fast;
 - [x] Snow blocks you are slow; (needs tweaking)
-- [ ] Win condition first one to cross the finish line;
+- [x] Win condition first one to cross the finish line;
 
 ## mvp 2
 - [ ] Build simple arcade physics engine; 

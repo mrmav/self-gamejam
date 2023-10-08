@@ -1,6 +1,8 @@
 #pragma once
 #include <Engine.h>
 #include <iostream>
+#include "Player.h"
+#include "GameCamera.h"
 
 namespace GameContent
 {
@@ -34,5 +36,9 @@ namespace GameContent
         * delta is the amount of time since the last frame
         */
         void Render(float delta) override;
+
+        static Player nullPlayer;
+        Player* CheckWinningCondition(MapLoader& world, Player& pone, Player& ptwo);
+        
     };
 }
