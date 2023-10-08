@@ -1,6 +1,6 @@
 
 
-# Local Multiplayer Ski Game!
+# Local Multiplayer Ski Game: SKI BUDDIES!
 This game is part of a self hosted game jam with just two people. It is an excuse to force myself to build something!
 
 This game uses the [little framework](https://github.com/mrmav/simple-cpp-engine) that I build in my spare time, as a learning exercise.
