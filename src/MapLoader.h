@@ -21,6 +21,7 @@ namespace GameContent
         const glm::vec2 GetWorldSize() const {return _WorldSize; };
         const glm::vec2 GetTileSize() const {return _TileSize; };
         const std::vector<int>& GetTerrainData() const { return _TerrainLayerData; };
+        const std::vector<int>& GetCollisionData() const { return _CollisionLayerData; };
 
         // masks
         std::vector<uint32_t> SnowTilesIndex  = { 1, 6 };
@@ -31,6 +32,7 @@ namespace GameContent
         json _MapData;
 
         std::vector<int> _TerrainLayerData;
+        std::vector<int> _CollisionLayerData;
 
         glm::vec2 _WorldTileSize;
         glm::vec2 _WorldSize;

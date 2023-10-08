@@ -3,7 +3,7 @@
 namespace GameContent
 {   
     // keeps the camera bounds this many tiles outwards from the player
-    const int PLAYER_DISPLAY_BLEED = 2;  
+    const int PLAYER_DISPLAY_BLEED = 4;  
     const int MIN_DISPLAY_WIDTH_TILES = 12;
     const int MAX_DISPLAY_WIDTH_TILES = 30;
 

@@ -55,11 +55,20 @@ namespace GameContent
 
         private:
 
+            int _Health = 3;
+            bool _Vulnerable = true;
+            double _VulnerableTimer = 0;
+            double _VulnerableTimeSince = 0;
+            double _VulnerableRate = 3;  // seconds
+            double _FlashRate = 0.05;
+            bool _Tinted = false;
+
             Ref<InputCursor> _Controller;
             
             const MapLoader* _LoadedMap;
             
             KinematicMaterial* _Kinematics;
+
             glm::vec2 _Acceleration = glm::vec2(0.0f, 0.0f);
             glm::vec2 _Velocity     = glm::vec2(0.0f, 0.0f);
 
@@ -74,8 +83,15 @@ namespace GameContent
                 Position += distance;
             }
 
+            bool IsColliding() const;
+            void Hurt();
+            bool GetVulnerableState() const { return _Vulnerable; };
+            int GetHealth() const { return _Health; };
+            void HandleVulnerability();
+
             std::string Name;
             glm::vec4 Color;
+            glm::vec4 TintColor = glm::vec4(1);
 
             void Update(float delta);
     };
