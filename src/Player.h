@@ -12,32 +12,45 @@ namespace GameContent
         const float SideMoveForce;
         const float SlideForce;
         const float Friction;
+        const float ChangingSpeedBreakForce;
 
         const float MaxSideMoveSpeed;
         const float MaxSlideSpeed;        
 
-        KinematicMaterial(float sideForce, float slideForce, float friction, float maxSideMoveSpeed, float maxSlideSpeed)
-            : SideMoveForce(sideForce), SlideForce(slideForce), Friction(friction),
+        KinematicMaterial(float sideForce, float slideForce, float friction, float changeSpeedForce, float maxSideMoveSpeed, float maxSlideSpeed)
+            : SideMoveForce(sideForce), SlideForce(slideForce), Friction(friction), ChangingSpeedBreakForce(changeSpeedForce),
             MaxSideMoveSpeed(maxSideMoveSpeed), MaxSlideSpeed(maxSlideSpeed)
         {
 
         }
 
-        void CalculateContribution(float delta, int direction, glm::vec2& acceleration)
+        void CalculateContribution(float delta, int direction, glm::vec2& acceleration, glm::vec2 const& velocity)
         {   
             acceleration.x = direction * SideMoveForce;
             acceleration.y = SlideForce;
+
+            // moving direction
+            int movingDirectionSide = velocity.x > 0 ? 1 : -1;
+            
+            // deceleration based on abrupt acceleration changes
+            if (direction != 0 && direction != movingDirectionSide)
+            {
+                //  direction change, should decrease the descending force
+                float brakeForce = ChangingSpeedBreakForce;
+                acceleration.y += brakeForce;
+            }
+
             acceleration *= delta;
-            //_ENGINE_LOG("force", "dir: " << direction << ", contrib: " << glm::to_string(acceleration))
 
         }
 
         void CapVelocity(glm::vec2& velocity)
         {
+
             // cap
             if(glm::abs(velocity.x) > MaxSideMoveSpeed)
-            {
-                int sign = velocity.x > 0 ? 1 : -1;                
+            {   
+                int sign = velocity.x > 0 ? 1 : -1;
                 velocity.x = MaxSideMoveSpeed * sign;
             }
             if(glm::abs(velocity.y) > MaxSlideSpeed)

@@ -4,12 +4,12 @@ namespace GameContent
 {
     
     KinematicMaterial kineticIceMaterial = KinematicMaterial(
-        // sideForce, slideForce, friction, maxSideMoveSpeed, maxSlideSpeed
-        80.0f, 10.0f, 0.9f, 300.0f, 250.0f
+        // sideForce, slideForce, friction, changeDirectionForce, maxSideMoveSpeed, maxSlideSpeed
+        80.0f, 10.0f, 0.9f, -4.0f, 300.0f, 250.0f
     );
 
     KinematicMaterial kineticSnowMaterial = KinematicMaterial(
-        100.0f, 5.0f, 0.6f, 200.0f, 200.0f
+        100.0f, 6.0f, 0.4f, 0.0f, 200.0f, 100.0f
     );
 
     Player::Player(int x, int y, Ref<AnimationSet> animations, Ref<InputCursor> controller, MapLoader* map)
@@ -68,7 +68,7 @@ namespace GameContent
         }
 
         // Apply
-        _Kinematics->CalculateContribution(delta, dir, _Acceleration);        
+        _Kinematics->CalculateContribution(delta, dir, _Acceleration, _Velocity);
         _Velocity += _Acceleration;
         _Kinematics->CapVelocity(_Velocity);
 
