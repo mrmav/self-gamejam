@@ -6,6 +6,7 @@ set(HEADERS
     Player.h
     InputCursor.h
     GameCamera.h
+    PlayState.h
 )
 
 set(SOURCE
@@ -17,6 +18,7 @@ set(SOURCE
     Player.cpp
     InputCursor.cpp
     GameCamera.cpp
+    PlayState.cpp
 )
 
 target_sources(${PROJECT_NAME} 
