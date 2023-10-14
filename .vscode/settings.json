@@ -3,7 +3,7 @@
         "-DGAME_INSTALL=ON",
         
         // simple-cpp-engine
-        "-DBUILD_TESTS=ON",
+        "-DBUILD_TESTS=OFF",
         "-DCOPY_SHADERS=ON",
 
         // GLFW
