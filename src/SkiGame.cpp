@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "SkiGame.h"
+#include "MenuState.h"
 #include "PlayState.h"
 
 namespace GameContent
@@ -21,7 +22,8 @@ namespace GameContent
     void SkiGame::Load()
     {        
         // insert game states here:
-        StateManager::GetSingleton().AddState("menuState", std::make_shared<PlayState>(this));
+        StateManager::GetSingleton().AddState("menuState", new MenuState(this));
+        StateManager::GetSingleton().AddState("playState", new PlayState(this));
         StateManager::GetSingleton().ChangeState("menuState", false);
 
     }    
