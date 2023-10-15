@@ -44,7 +44,7 @@ namespace GameContent
         glClearColor(0.392, 0.584, 0.929, 1);  // good ol' cornflower blue
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        batcher->Begin(shader.get(), camera.get(), glm::vec4(1, 0, 0, 1));
+        batcher->Begin(shader.get(), camera.get());
         batcher->DrawString(font.get(), 0, 18, "Press space bar to start the game!");
         batcher->End();
 

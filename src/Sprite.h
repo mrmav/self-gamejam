@@ -25,8 +25,8 @@ namespace GameContent
         Sprite(int x, int y, Ref<AnimationSet> animations);
         ~Sprite() { };
 
-        void Update(float delta);
-        void Render(float delta, Ref<Spritebatch> batcher) const;
+        void virtual Update(float delta);
+        void virtual Render(float delta, Ref<Spritebatch> batcher) const;
 
         FrameAnimation* SetAnimation(std::string animationName);
 

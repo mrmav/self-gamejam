@@ -110,6 +110,7 @@ namespace GameContent
         // We area assuming that there is only one tileset.
         // Assuming this, we render each layer in a separate pass:        
         uint16_t depth = 0;
+        batcher->Begin(shader.get(), camera.get());
         for(auto& layer : layers_data)
         {
             
@@ -118,7 +119,6 @@ namespace GameContent
 
             int currentTileIndex = 0;
 
-            batcher->Begin(shader.get(), camera.get(), glm::vec4(1), depth);
 
             std::string str = layer.at("name");
             bool is_p = str == std::string("PowerUps");
@@ -138,58 +138,56 @@ namespace GameContent
                                                                                      // To fix this, we subtract ONE before drawing.
                 }
             }
-            batcher->End();
             depth += 1;
             
         }
-        batcher->Begin(shader.get(), camera.get(), glm::vec4(1));
+
         badguy.Render(delta, batcher);
+        DrawPlayerWorld(batcher, playerOne, delta);
+        DrawPlayerWorld(batcher, playerTwo, delta);
+        
         batcher->End();
 
 
-        DrawPlayerWorld(batcher, playerOne, delta);
-        DrawPlayerWorld(batcher, playerTwo, delta);
 
         // Render UI stuff with the custom transform
         float UIScale = 4.0f;
         batcher->SetCustomView(glm::mat4(1) * glm::scale(glm::vec3(UIScale)));
 
         // render player health
-        batcher->Begin(shader.get(), camera.get(), glm::vec4(1), 0, true);
+        batcher->Begin(shader.get(), camera.get(), 0, true);
         DrawPlayerHealth(batcher, playerOne, glm::vec2(8, 8), 1);
         DrawPlayerHealth(batcher, playerTwo, glm::vec2(v.Width() / UIScale - 9 - 8, 8), -1);
-        batcher->End();
 
 
         // Render winning string:
         if(winningPlayer != &nullPlayer)
         {
-            batcher->Begin(shader.get(), camera.get(), winningPlayer->Color, 0, true);
-
             std::string str = std::string("Player ") + winningPlayer->Name;
             glm::vec2 strSize = font->GetStringSize(str);
             glm::vec2 UIDisplaySize = glm::vec2(v.Width(), v.Height()) / UIScale;
             
-            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f, str.c_str());
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f, str.c_str(), winningPlayer->Color);
             
             str = "Wins!";
             strSize = font->GetStringSize(str);
-            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 16.0f, str.c_str());
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 16.0f, str.c_str(), winningPlayer->Color);
 
             str = "Restart: r";
             strSize = font->GetStringSize(str);
-            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f, str.c_str());
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f, str.c_str(), winningPlayer->Color);
 
             str = "or gamepad";
             strSize = font->GetStringSize(str);
-            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f + 16.0f, str.c_str());
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f + 16.0f, str.c_str(), winningPlayer->Color);
 
             str = "start";
             strSize = font->GetStringSize(str);
-            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f + 32.0f, str.c_str());
+            batcher->DrawString(font.get(), UIDisplaySize.x / 2.0f - strSize.x / 2.0f, UIDisplaySize.y / 2.0f - strSize.y / 2.0f + 48.0f + 32.0f, str.c_str(), winningPlayer->Color);
 
-            batcher->End();
         }
+
+        batcher->End();
     }
 
     void PlayState::Shutdown()
@@ -242,16 +240,8 @@ namespace GameContent
     {
         if(p.GetHealth() > 0)
         {
-            batcher->Begin(shader.get(), camera.get(), p.TintColor);
             p.Render(delta, batcher);
-            batcher->End();
-
-            // Render players labels.
-            // I have to render in separate batchs because i want different tints.
-            // I can improve this in the future in the framework...
-            batcher->Begin(shader.get(), camera.get(), glm::vec4(p.Color.r, p.Color.g, p.Color.b, 0.6f));
-            batcher->DrawString(font.get(), p.Position.x, p.Position.y - 20, p.Name.c_str());
-            batcher->End();
+            batcher->DrawString(font.get(), p.Position.x, p.Position.y - 20, p.Name.c_str(), glm::vec4(p.Color.r, p.Color.g, p.Color.b, 0.6f));
         }
     }
 

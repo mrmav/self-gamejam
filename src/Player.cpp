@@ -111,6 +111,14 @@ namespace GameContent
         Sprite::Update(delta);
     }
 
+    void Player::Render(float delta, Ref<Spritebatch> batcher) const
+    {
+        if(!_CurrentAnimation) return;
+
+        // assuming begin was called
+        batcher->Draw(_CurrentAnimation->GetTexture().get(), Position.x, Position.y, *_CurrentAnimation->currentFramePtr, Rotation, TintColor);
+    }
+
     bool Player::IsColliding() const
     {
         std::vector<glm::ivec2> corners;

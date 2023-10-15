@@ -93,7 +93,8 @@ namespace GameContent
             glm::vec4 Color;
             glm::vec4 TintColor = glm::vec4(1);
 
-            void Update(float delta);
+            void Update(float delta) override;
+            void Render(float delta, Ref<Spritebatch> batcher) const override;
 
             void Reset();
     };
