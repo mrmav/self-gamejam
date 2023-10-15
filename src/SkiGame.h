@@ -6,9 +6,6 @@
 
 namespace GameContent
 {
-
-    void UpdateDebugCamera(float delta, Ref<Engine::Camera2D> camera);
-
     class SkiGame : public Engine::Game
     {
     public:
@@ -23,6 +20,14 @@ namespace GameContent
         * Use this function to load and create the game elements
         */
         void Load() override;
+
+
+        void Shutdown() override;
+
+        // these controllers will be refactored so the player can
+        // change from a list which they want to use.
+        Ref<InputCursor> playerOneController;
+        Ref<InputCursor> playerTwoController;
 
     };
 }

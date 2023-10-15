@@ -22,7 +22,7 @@ namespace GameContent
 
         public:
 
-        PlayState(Game* game);
+        PlayState(void* game);
         ~PlayState();
 
         void Init() override;
@@ -39,13 +39,12 @@ namespace GameContent
         Player nullPlayer = Player();
         Player drawPlayer = Player();
 
-        Viewport gameViewport;
-        Ref<GameCamera> camera;
-        Ref<Shader> shader;
-        
+        Ref<GameCamera> camera;        
         Ref<Spritebatch> batcher;
+        Ref<BitmapFont> font;
+        Ref<Shader> shader;
 
-        Ref<Texture2D> TILEMAP;
+        Ref<Texture2D> tilemap;
         Ref<FrameAnimation> animation;
 
         MapLoader map;
@@ -82,6 +81,5 @@ namespace GameContent
         Player playerTwo;
         Player* winningPlayer = &nullPlayer;
 
-        Ref<BitmapFont> font;
     };
 }

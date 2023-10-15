@@ -2,7 +2,7 @@
 
 namespace GameContent
 {
-    PlayState::PlayState(Game* game)
+    PlayState::PlayState(void* game)
         : GameState(game)
     {
         _ENGINE_LOG("PlayState", "Constructor")
@@ -18,72 +18,49 @@ namespace GameContent
         _ENGINE_LOG("PlayState", "Init")
 
         map = MapLoader("assets/tiled/map.json");
-        // json map_data = map.GetData();
-        // std::cout << map_data["version"] << std::endl;
 
+        Viewport& v = GetGame<SkiGame>()->GetViewport();
 
-        // init the game viewport to default to window size
-        Viewport& v = GetGame()->GetViewport();
-        gameViewport = Viewport(v.Width(), v.Height());
-
-        //camera = std::make_shared<Camera2D>(gameViewport);
         camera = std::make_shared<GameCamera>(v, map);
         camera->Zoom = 1;
-
         batcher = std::make_shared<Spritebatch>();
         shader = std::make_shared<Shader>("assets/shaders/vertex.vert", "assets/shaders/fragment.frag");
-
-        TILEMAP = std::make_shared<Texture2D>("assets/kenney_tiny-ski/Tilemap/tilemap.png", TextureParams());
-        tileset = std::make_shared<TileSet>(TILEMAP, 12, 0, 16, 16, 0, 1);
-
         font = std::make_shared<BitmapFont>("assets/font.png", 16, 16);
 
-        // animation = std::make_shared<FrameAnimation>(TILEMAP, frames.data(), 3);
-        // animation->loop = true;
-        // animation->SetFps(6);
+        tilemap = std::make_shared<Texture2D>("assets/kenney_tiny-ski/Tilemap/tilemap.png", TextureParams());
+        tileset = std::make_shared<TileSet>(tilemap, 12, 0, 16, 16, 0, 1);
 
         // test sprites
         badguyAnimationsMap = {
-            {"idle",   FrameAnimation(TILEMAP, badGuyIdleFrames.data(),   2)},
-            {"attack", FrameAnimation(TILEMAP, badGuyAttackFrames.data(), 1)}
+            {"idle",   FrameAnimation(tilemap, badGuyIdleFrames.data(),   2)},
+            {"attack", FrameAnimation(tilemap, badGuyAttackFrames.data(), 1)}
         };
         badguy = Sprite(8 * 16, 7 * 16, std::make_shared<AnimationSet>(badguyAnimationsMap));
 
         // test sprites
         playerOneAnimationsMap = {
-            {"ski", FrameAnimation(TILEMAP, playerOneSkiFrames.data(), 2)}
+            {"ski", FrameAnimation(tilemap, playerOneSkiFrames.data(), 2)}
         };
         playerTwoAnimationsMap = {
-            {"ski", FrameAnimation(TILEMAP, playerTwoSkiFrames.data(), 2)}
+            {"ski", FrameAnimation(tilemap, playerTwoSkiFrames.data(), 2)}
         };
         
-        // for a keyboard controller:
-        Ref<InputCursor> playerTwoController = std::make_shared<InputCursor>(Key::Left, Key::Right, Key::Space);
-
-        // for a gamepad controller:
-        Ref<InputCursor> playerOneController = std::make_shared<InputCursor>(0, GamePadButton::DPadLeft, GamePadButton::DPadRight, GamePadButton::ButtonA);
-        
-        // for a gamepad controller with axis (sticks):
-        //Ref<InputCursor> playerOneController = std::make_shared<InputCursor>(0, true, GamePadAxis::GamePadAxisLeftX, GamePadButton::ButtonA);
-        
-
-        playerOne = Player(14 * 16, 2 * 16, std::make_shared<AnimationSet>(playerOneAnimationsMap), playerOneController, &map);
+        playerOne = Player(14 * 16, 2 * 16, std::make_shared<AnimationSet>(playerOneAnimationsMap), GetGame<SkiGame>()->playerOneController, &map);
         playerOne.SetAnimation("ski")->Play();
         playerOne.Name = "1";
-        playerOne.Color = glm::vec4(0.819608f, 0.462745f, 0.815686, 1);        
-        
+        playerOne.Color = glm::vec4(0.819608f, 0.462745f, 0.815686, 1);
 
-        playerTwo = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerTwoAnimationsMap), playerTwoController, &map);
+        playerTwo = Player(16 * 16, 2 * 16, std::make_shared<AnimationSet>(playerTwoAnimationsMap), GetGame<SkiGame>()->playerTwoController, &map);
         playerTwo.SetAnimation("ski")->Play();
         playerTwo.Name = "2";
         playerTwo.Color = glm::vec4(0.517647f, 0.776471f, 0.411765, 1);
 
-        Input::SetDeadZone(0, 0.2f);
+        
     }
 
     void PlayState::Update(float delta)
     {
-        _ENGINE_LOG("PlayState", "Update")
+        //_ENGINE_LOG("PlayState", "Update")
 
         if(Input::IsKeyJustDown(Key::N))
         {
@@ -94,6 +71,10 @@ namespace GameContent
         {
             std::cout << "Btn Attack" << std::endl;
             badguy.SetAnimation("attack")->Play();
+        }
+        if(Input::IsKeyJustDown(Key::Escape))
+        {
+            StateManager::GetSingleton().ChangeState("menuState", false);
         }
 
         badguy.Update(delta);
@@ -114,11 +95,11 @@ namespace GameContent
 
     void PlayState::Render(float delta)
     {
-        _ENGINE_LOG("PlayState", "Draw")
+        //_ENGINE_LOG("PlayState", "Draw")
         glClearColor(0.392, 0.584, 0.929, 1);  // good ol' cornflower blue
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        Viewport& v = GetGame()->GetViewport();
+        Viewport& v = GetGame<SkiGame>()->GetViewport();
         
         // lets try to render the map
         json map_data = map.GetData();
@@ -223,7 +204,7 @@ namespace GameContent
         for(int i = 0; i < player.GetHealth(); i++)
         {   
             float x = start.x + ((9 + offset) * i) * dir;
-            batcher->Draw(TILEMAP.get(), x, start.y, Rectangle<int>(136, 53, 9, 9));            
+            batcher->Draw(tilemap.get(), x, start.y, Rectangle<int>(136, 53, 9, 9));            
 
         }
     }
