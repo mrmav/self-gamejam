@@ -15,7 +15,12 @@ void main(){
     
     vertexColor = aColor;
     textureCoord = aTexture;
+    
+    // by flooring the screenpos, we get rid the tilemap lines
+    // caused by the half pixel sampling.
+    vec4 screenpos = uView * uModel * vec4(aPos, 1.0);
+    vec4 pos = uProjection * vec4(floor(screenpos.xyz), screenpos.w);
 
-    gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);
+    gl_Position = pos;
 
 }
