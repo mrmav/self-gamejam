@@ -34,7 +34,7 @@ function(copy_resources DEPENDENCY_TARGET)
     set(DESTINATION_DIR $<TARGET_FILE_DIR:${DEPENDENCY_TARGET}>/assets)
 
     add_custom_command(TARGET ${DEPENDENCY_TARGET}
-        COMMAND ${CMAKE_COMMAND} -E rm -R ${DESTINATION_DIR}
+        COMMAND ${CMAKE_COMMAND} -E rm -Rf ${DESTINATION_DIR}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${DESTINATION_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${RES_DIR} ${DESTINATION_DIR}
         COMMENT "Copying resources: ${RES_DIR} to ${DESTINATION_DIR}"
